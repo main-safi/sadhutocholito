@@ -3,42 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>সাধু ভাষা অভিধান ও রূপান্তরক</title>
+  <title>ইংরেজি ➔ সাধু ভাষা রূপান্তরক</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
   <div class="container">
     <header>
-      <h1>সাধু ভাষা অভিধান</h1>
-      <p class="subtitle">চলিত ⇄ সাধু রূপান্তরক এবং ইংরেজি-সাধু অভিধান</p>
+      <h1>সাধু ভাষা অনুবাদক ও অভিধান</h1>
+      <p class="subtitle">English ➔ Sadhu Bhasha Translator</p>
     </header>
 
-    <!-- Navigation Tabs -->
-    <div class="tabs">
-      <button id="tab-convert" class="tab-btn active" onclick="switchTab('convert')">চলিত ➔ সাধু রূপান্তর</button>
-      <button id="tab-dict" class="tab-btn" onclick="switchTab('dict')">ইংরেজি ⇄ সাধু অভিধান</button>
-    </div>
+    <div class="panel active">
+      <label for="english-input"><strong>English Text:</strong></label>
+      <textarea id="english-input" placeholder="Enter English sentence (e.g., They are eating rice and reading books...)"></textarea>
+      
+      <button class="action-btn" onclick="handleEnglishToSadhuTranslation()">Translate to Sadhu Bhasha</button>
 
-    <!-- Panel 1: Sentence Converter -->
-    <div id="panel-convert" class="panel active">
-      <label for="cholito-input"><strong>চলিত বাক্য লিখুন:</strong></label>
-      <textarea id="cholito-input" placeholder="যেমন: তারা কাজ করছে..."></textarea>
-      <button class="action-btn" onclick="handleConversion()">রূপান্তর করুন</button>
-
-      <div class="output-box">
-        <strong>সাধু রূপ:</strong>
-        <p id="sadhu-output">ফলাফল এখানে প্রদর্শিত হবে...</p>
-      </div>
-    </div>
-
-    <!-- Panel 2: Dictionary Search -->
-    <div id="panel-dict" class="panel">
-      <label for="dict-search"><strong>শব্দ খুঁজুন (English, সাধু বা চলিত):</strong></label>
-      <input type="text" id="dict-search" placeholder="e.g., eat, জল..." oninput="handleSearch()">
-
-      <div id="dict-results" class="dictionary-result">
-        <!-- Search results load here -->
+      <div class="output-box" id="sadhu-output">
+        ফলাফল এখানে প্রদর্শিত হবে...
       </div>
     </div>
   </div>
