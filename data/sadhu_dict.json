@@ -1,0 +1,26 @@
+[
+  {
+    "english": "eat",
+    "sadhu": "ভক্ষণ করা / আহার করা",
+    "cholito": "খাওয়া",
+    "pos": "verb"
+  },
+  {
+    "english": "read",
+    "sadhu": "পাঠ করা / অধ্যয়ন করা",
+    "cholito": "পড়া",
+    "pos": "verb"
+  },
+  {
+    "english": "they",
+    "sadhu": "তাহারা",
+    "cholito": "তারা",
+    "pos": "pronoun"
+  },
+  {
+    "english": "water",
+    "sadhu": "জল",
+    "cholito": "পানি",
+    "pos": "noun"
+  }
+]
