@@ -1,40 +1,68 @@
 let verbRules = { pronouns: {}, verb_suffixes: [] };
+let rulesLoaded = false;
 
+// Async function to load rules with fallback path checking
 async function loadRules() {
-  try {
-    const response = await fetch('./data/verb_rules.json');
-    verbRules = await response.json();
-  } catch (error) {
-    console.error('Error loading conversion rules:', error);
+  const paths = [
+    './data/verb_rules.json',
+    '../data/verb_rules.json',
+    '/data/verb_rules.json'
+  ];
+
+  for (const path of paths) {
+    try {
+      const response = await fetch(path);
+      if (response.ok) {
+        verbRules = await response.json();
+        
+        // Sort verb suffixes by length descending (longest rules match first)
+        if (verbRules.verb_suffixes) {
+          verbRules.verb_suffixes.sort((a, b) => b.cholito.length - a.cholito.length);
+        }
+        
+        rulesLoaded = true;
+        console.log('Verb rules successfully loaded from:', path);
+        return;
+      }
+    } catch (e) {
+      // Continue trying next fallback path
+    }
   }
+  console.error('Failed to load verb_rules.json from all attempted paths.');
 }
 
+// Main conversion logic
 function convertCholitoToSadhu(text) {
-  if (!text.trim()) return '';
+  if (!text || !text.trim()) return '';
 
-  const words = text.trim().split(/\s+/);
+  // Separate Bangla words and preserve punctuation marks (।, ?, !, commas)
+  const tokens = text.trim().split(/(\s+|[।,.?!:-])/);
 
-  const convertedWords = words.map(word => {
-    const cleanWord = word.replace(/[।,?!]/g, '');
-    const punctuation = word.slice(cleanWord.length);
-
-    // 1. Direct Pronoun & High-Frequency Words Replacement
-    if (verbRules.pronouns[cleanWord]) {
-      return verbRules.pronouns[cleanWord] + punctuation;
+  const convertedTokens = tokens.map(token => {
+    if (!token || /^\s+$/.test(token) || /[।,.?!:-]/.test(token)) {
+      return token; // Leave whitespace and punctuation untouched
     }
 
-    // 2. Verb Suffix Matching
-    for (const rule of verbRules.verb_suffixes) {
-      if (cleanWord.endsWith(rule.cholito)) {
-        const root = cleanWord.slice(0, -rule.cholito.length);
-        return root + rule.sadhu + punctuation;
+    // 1. Direct Pronoun & Static Word Match
+    if (verbRules.pronouns && verbRules.pronouns[token]) {
+      return verbRules.pronouns[token];
+    }
+
+    // 2. Verb Suffix Replacement (Longest matching suffix first)
+    if (verbRules.verb_suffixes) {
+      for (const rule of verbRules.verb_suffixes) {
+        if (token.endsWith(rule.cholito)) {
+          const root = token.slice(0, -rule.cholito.length);
+          return root + rule.sadhu;
+        }
       }
     }
 
-    return word;
+    return token;
   });
 
-  return convertedWords.join(' ');
+  return convertedTokens.join('');
 }
 
+// Trigger initial loading
 loadRules();
