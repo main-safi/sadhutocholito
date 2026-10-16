@@ -1,54 +1,40 @@
-let verbRules = { pronouns: {}, verb_suffixes: [] };
-let rulesLoaded = false;
+let verbRules = { irregular_verbs: {}, pronouns: {}, verb_suffixes: [] };
 
-// Async function to load rules with fallback path checking
 async function loadRules() {
-  const paths = [
-    './data/verb_rules.json',
-    '../data/verb_rules.json',
-    '/data/verb_rules.json'
-  ];
-
-  for (const path of paths) {
-    try {
-      const response = await fetch(path);
-      if (response.ok) {
-        verbRules = await response.json();
-        
-        // Sort verb suffixes by length descending (longest rules match first)
-        if (verbRules.verb_suffixes) {
-          verbRules.verb_suffixes.sort((a, b) => b.cholito.length - a.cholito.length);
-        }
-        
-        rulesLoaded = true;
-        console.log('Verb rules successfully loaded from:', path);
-        return;
+  try {
+    const response = await fetch('./data/verb_rules.json');
+    if (response.ok) {
+      verbRules = await response.json();
+      if (verbRules.verb_suffixes) {
+        verbRules.verb_suffixes.sort((a, b) => b.cholito.length - a.cholito.length);
       }
-    } catch (e) {
-      // Continue trying next fallback path
     }
+  } catch (error) {
+    console.error('Error loading rules:', error);
   }
-  console.error('Failed to load verb_rules.json from all attempted paths.');
 }
 
-// Main conversion logic
 function convertCholitoToSadhu(text) {
   if (!text || !text.trim()) return '';
 
-  // Separate Bangla words and preserve punctuation marks (।, ?, !, commas)
   const tokens = text.trim().split(/(\s+|[।,.?!:-])/);
 
   const convertedTokens = tokens.map(token => {
     if (!token || /^\s+$/.test(token) || /[।,.?!:-]/.test(token)) {
-      return token; // Leave whitespace and punctuation untouched
+      return token;
     }
 
-    // 1. Direct Pronoun & Static Word Match
+    // 1. Check Irregular Verbs first (fixes "খাচ্ছে" -> "খাইতেছে")
+    if (verbRules.irregular_verbs && verbRules.irregular_verbs[token]) {
+      return verbRules.irregular_verbs[token];
+    }
+
+    // 2. Check Pronouns & Direct Words
     if (verbRules.pronouns && verbRules.pronouns[token]) {
       return verbRules.pronouns[token];
     }
 
-    // 2. Verb Suffix Replacement (Longest matching suffix first)
+    // 3. Check General Suffixes
     if (verbRules.verb_suffixes) {
       for (const rule of verbRules.verb_suffixes) {
         if (token.endsWith(rule.cholito)) {
@@ -64,5 +50,4 @@ function convertCholitoToSadhu(text) {
   return convertedTokens.join('');
 }
 
-// Trigger initial loading
 loadRules();
